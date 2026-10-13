@@ -17,6 +17,9 @@ struct ConfigField {
   std::string help;
   std::string unit;
   std::string group;
+  // Shown inside an empty text or number box as a hint. Never a value: it is not stored and
+  // never becomes the default.
+  std::string placeholder;
   // Already-encoded JSON, not a display string -- it is spliced straight into the store.
   std::string defJson;
   // Select choices, comma-joined into one string to save the allocations a vector would cost.

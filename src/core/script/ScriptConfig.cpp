@@ -68,11 +68,14 @@ std::string firstOption(const std::string& list) {
   return comma == std::string::npos ? list : list.substr(0, comma);
 }
 
-enum class Attr : uint8_t { Default, Help, Unit, Options, Min, Max, Step, MaxLen, Group, Unknown };
+enum class Attr : uint8_t {
+  Default, Help, Unit, Options, Min, Max, Step, MaxLen, Group, Placeholder, Unknown
+};
 
 Attr attrOf(const std::string& name) {
-  static constexpr const char* kNames[] = {"default", "help",  "unit", "options",
-                                           "min",     "max",   "step", "maxlen", "group"};
+  static constexpr const char* kNames[] = {"default", "help",   "unit",  "options",
+                                           "min",     "max",    "step",  "maxlen",
+                                           "group",   "placeholder"};
   for (std::size_t i = 0; i < sizeof(kNames) / sizeof(kNames[0]); ++i)
     if (ieq(name, kNames[i])) return static_cast<Attr>(i);
   return Attr::Unknown;
@@ -404,6 +407,10 @@ void parseLine(const std::string& value, int line, ConfigSchema& schema) {
         f.group = attr;
         clip(f.group, kMaxLabelLen);
         break;
+      case Attr::Placeholder:
+        f.placeholder = attr;
+        clip(f.placeholder, kMaxLabelLen);
+        break;
       case Attr::Options:
         f.options = splitOptions(attr);
         break;
@@ -564,6 +571,7 @@ bool appendConfigJson(std::string& out, const std::string& name, const ConfigSch
     if (!f.help.empty()) w.member("help", f.help);
     if (!f.unit.empty()) w.member("unit", f.unit);
     if (!f.group.empty()) w.member("group", f.group);
+    if (!f.placeholder.empty()) w.member("placeholder", f.placeholder);
     if (f.hasMin) w.member("min", f.min);
     if (f.hasMax) w.member("max", f.max);
     if (f.step != 0) w.member("step", f.step);
